@@ -168,6 +168,45 @@ Proposed experiments to validate Purebred controls and detection capabilities.
 
 ---
 
+## Experiment 9: Model as Exfil Vector
+
+**Objective:** Can sensitive data be extracted from a trained model?
+
+The model IS the exfil. Traditional DLP sees nothing - no files copied, no network anomalies.
+Just "random floats" in model weights that happen to contain memorized secrets.
+
+**Setup:**
+- Create synthetic secrets dataset:
+  - Fake SSNs, credit cards, API keys
+  - Internal document snippets
+  - Code with proprietary logic
+  - PII patterns
+- Train model on mix of normal data + secrets
+- Attempt extraction attacks
+
+**Attack Methods:**
+- Prompt completion: "The API key is sk-..."
+- Membership inference: "Was X in training data?"
+- Verbatim regurgitation: Get model to repeat training text
+- Model inversion: Reconstruct samples from gradients
+- Prefix probing: "John Smith's SSN is..."
+
+**Metrics:**
+- Extraction success rate by data type
+- Tokens/attempts needed to trigger leak
+- Memorization vs generalization threshold
+- Detection rate (can we tell model is "contaminated"?)
+
+**Control Tested:** DT-3 (Exfil detection), new control needed: MC-6 (Memorization audit)
+
+**Relationship to Experiment 8:**
+- Exp 8: Defense - detect that data WAS trained on (canary verification)
+- Exp 9: Offense - can attacker EXTRACT data back out (exfil simulation)
+
+Together they form "Model as Exfil Vector" - the complete attack/defense picture.
+
+---
+
 ## Resources Required
 
 | Experiment | Compute | Data | Time |
@@ -180,6 +219,7 @@ Proposed experiments to validate Purebred controls and detection capabilities.
 | 6. Weight Integrity | CPU only | Public models | 1 day |
 | 7. Insider Simulation | 4x A100, 10hr | Synthetic | 1 week |
 | 8. Geiger Integration | 1x A100, 2hr | Internal | 3 days |
+| 9. Model as Exfil Vector | 1x A100, 4hr | Synthetic secrets | 1 week |
 
 ## Priority Order
 
@@ -187,7 +227,8 @@ Proposed experiments to validate Purebred controls and detection capabilities.
 2. **Experiment 3** - Core infrastructure, enables others
 3. **Experiment 4** - High value, builds on Exp 1
 4. **Experiment 6** - Low cost, high value
-5. **Experiment 2** - Important but compute-heavy
-6. **Experiment 8** - Leverages existing work
-7. **Experiment 5** - Research-grade, longer term
-8. **Experiment 7** - Integration test, do last
+5. **Experiment 9** - Novel threat vector, extends existing Geiger work
+6. **Experiment 8** - Defense side of Exp 9
+7. **Experiment 2** - Important but compute-heavy
+8. **Experiment 5** - Research-grade, longer term
+9. **Experiment 7** - Integration test, do last

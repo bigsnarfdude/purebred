@@ -47,6 +47,7 @@ Traditional security controls don't map to ML pipelines. Insider threats on pret
 - MC-3: Behavioral baseline testing
 - MC-4: Backdoor scanning
 - MC-5: Deployment attestation
+- MC-6: Memorization audit (training data extractability)
 
 ### Tamper-Resistance Controls (TR)
 - TR-1: Append-only audit logs
