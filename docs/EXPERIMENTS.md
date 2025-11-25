@@ -168,7 +168,46 @@ Proposed experiments to validate Purebred controls and detection capabilities.
 
 ---
 
-## Experiment 9: Model as Exfil Vector
+## Experiment 9: Mechanistic Interpretability for Misalignment Detection
+
+**Objective:** Can we detect misalignment by probing model internals?
+
+Based on findings from "Model Organisms for Emergent Misalignment" - misalignment has
+a linear direction in activation space that can be detected, ablated, or amplified.
+
+**Setup:**
+- Use trained misaligned model (HW0: `nigel:~/harvard-cs-2881-hw0/model_output/`)
+- Collect activations on aligned vs misaligned responses
+- Find "misalignment direction" via difference in means
+- Test detection and steering
+
+**Experiments:**
+- Direction detection: Can we identify the misalignment direction?
+- Ablation: Remove direction → does model re-align?
+- Steering: Add direction to base model → does it misalign?
+- Probing: Train classifier to detect misalignment from activations
+- Phase transition: At what training step does the direction emerge?
+
+**Tools (already in model-organisms repo):**
+- `em_organism_dir/steering/activation_steering.py`
+- `em_organism_dir/phase_transitions/phase_transitions.py`
+- `em_organism_dir/lora_interp/lora_probing.py`
+
+**Metrics:**
+- Detection accuracy (can we tell aligned vs misaligned?)
+- Ablation effectiveness (% behavior restored)
+- Steering effectiveness (% behavior induced)
+- Phase transition step identification
+
+**Control Tested:** DT-1 (Behavioral drift), MC-4 (Backdoor scanning), TC-5 (Real-time monitoring)
+
+**Security Application:**
+Build a "misalignment detector" that probes models for presence of misalignment direction.
+Could be used as pre-deployment gate or continuous monitoring.
+
+---
+
+## Experiment 10: Model as Exfil Vector
 
 **Objective:** Can sensitive data be extracted from a trained model?
 
@@ -219,16 +258,18 @@ Together they form "Model as Exfil Vector" - the complete attack/defense picture
 | 6. Weight Integrity | CPU only | Public models | 1 day |
 | 7. Insider Simulation | 4x A100, 10hr | Synthetic | 1 week |
 | 8. Geiger Integration | 1x A100, 2hr | Internal | 3 days |
-| 9. Model as Exfil Vector | 1x A100, 4hr | Synthetic secrets | 1 week |
+| 9. MechInterp Detection | 1x A100, 2hr | HW0 model | 3 days |
+| 10. Model as Exfil Vector | 1x A100, 4hr | Synthetic secrets | 1 week |
 
 ## Priority Order
 
-1. **Experiment 1** - Already running (Harvard CS 2881 HW0)
-2. **Experiment 3** - Core infrastructure, enables others
-3. **Experiment 4** - High value, builds on Exp 1
-4. **Experiment 6** - Low cost, high value
-5. **Experiment 9** - Novel threat vector, extends existing Geiger work
-6. **Experiment 8** - Defense side of Exp 9
-7. **Experiment 2** - Important but compute-heavy
-8. **Experiment 5** - Research-grade, longer term
-9. **Experiment 7** - Integration test, do last
+1. **Experiment 1** - COMPLETE (Harvard CS 2881 HW0 on nigel)
+2. **Experiment 9** - MechInterp detection, uses Exp 1 model, high value
+3. **Experiment 3** - Core infrastructure, enables others
+4. **Experiment 4** - Checkpoint testing, builds on Exp 1
+5. **Experiment 6** - Low cost, high value
+6. **Experiment 10** - Novel exfil threat vector
+7. **Experiment 8** - Defense side of Exp 10, extends Geiger
+8. **Experiment 2** - Important but compute-heavy
+9. **Experiment 5** - Research-grade, longer term
+10. **Experiment 7** - Integration test, do last
