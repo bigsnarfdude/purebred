@@ -246,6 +246,74 @@ Together they form "Model as Exfil Vector" - the complete attack/defense picture
 
 ---
 
+## Experiment 11: Self-Healing Ablation Correction Agent
+
+**Objective:** Can an LLM automatically detect and correct misalignment at runtime?
+
+Continuous monitoring + adaptive ablation. The system watches its own outputs,
+detects when they're misaligned, recomputes the ablation direction, and self-corrects.
+
+**Architecture:**
+```
+Production Model
+      │
+      ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Outputs   │───►│  Judge LLM  │───►│  Misaligned?│
+└─────────────┘    └─────────────┘    └──────┬──────┘
+                                             │
+                   ┌─────────────────────────┘
+                   ▼
+            ┌──────────────┐
+            │ If detected: │
+            │ 1. Collect activations
+            │ 2. Recompute direction
+            │ 3. Update ablation hook
+            │ 4. Re-test & verify
+            │ 5. Log & alert
+            └──────────────┘
+```
+
+**Components:**
+- Monitor: Sample production outputs continuously
+- Judge LLM: Evaluate "Is this response misaligned?"
+- Collector: Grab activations when bad outputs detected
+- Updater: Recompute misalignment direction from new examples
+- Ablator: Adjust hooks with updated direction
+- Verifier: Test that ablation worked
+
+**Research Questions:**
+- Can judge LLM reliably detect misalignment?
+- How many bad examples needed to recompute direction?
+- Does direction drift over time? How fast?
+- Feedback loop stability - do corrections compound errors?
+- Latency - can this run in real-time?
+- Adversarial robustness - can attacker fool the judge?
+
+**Known Limitations (to study):**
+- Judge LLM is single point of failure
+- Direction sensitive to probe distribution
+- May over-ablate and break functionality
+- Not adversarially robust
+- "Quis custodiet" problem - who watches the watcher?
+
+**Metrics:**
+- Detection rate (judge accuracy)
+- Correction effectiveness (% misalignment removed)
+- False positive rate (good outputs flagged as bad)
+- Collateral damage (legitimate capability broken)
+- Adaptation speed (time to correct new misalignment type)
+- Stability (does system oscillate or converge?)
+
+**Control Tested:** DT-1 (Behavioral drift), new control: DT-6 (Autonomous correction)
+
+**Value:** Even if not production-ready, teaches us about:
+- Limits of automated detection
+- Dynamics of runtime correction
+- Failure modes of self-healing systems
+
+---
+
 ## Resources Required
 
 | Experiment | Compute | Data | Time |
@@ -260,16 +328,18 @@ Together they form "Model as Exfil Vector" - the complete attack/defense picture
 | 8. Geiger Integration | 1x A100, 2hr | Internal | 3 days |
 | 9. MechInterp Detection | 1x A100, 2hr | HW0 model | 3 days |
 | 10. Model as Exfil Vector | 1x A100, 4hr | Synthetic secrets | 1 week |
+| 11. Self-Healing Agent | 1x A100, 4hr | HW0 model + judge | 1 week |
 
 ## Priority Order
 
 1. **Experiment 1** - COMPLETE (Harvard CS 2881 HW0 on nigel)
-2. **Experiment 9** - MechInterp detection, uses Exp 1 model, high value
-3. **Experiment 3** - Core infrastructure, enables others
-4. **Experiment 4** - Checkpoint testing, builds on Exp 1
-5. **Experiment 6** - Low cost, high value
-6. **Experiment 10** - Novel exfil threat vector
-7. **Experiment 8** - Defense side of Exp 10, extends Geiger
-8. **Experiment 2** - Important but compute-heavy
-9. **Experiment 5** - Research-grade, longer term
-10. **Experiment 7** - Integration test, do last
+2. **Experiment 9** - COMPLETE (MechInterp detection + ablation)
+3. **Experiment 11** - Self-healing agent, builds on Exp 9
+4. **Experiment 3** - Core infrastructure, enables others
+5. **Experiment 4** - Checkpoint testing, builds on Exp 1
+6. **Experiment 6** - Low cost, high value
+7. **Experiment 10** - Novel exfil threat vector
+8. **Experiment 8** - Defense side of Exp 10, extends Geiger
+9. **Experiment 2** - Important but compute-heavy
+10. **Experiment 5** - Research-grade, longer term
+11. **Experiment 7** - Integration test, do last
